@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Data Pengurus</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .menu-button {
+            transition: all 0.2s;
+        }
+        .menu-button:hover {
+            transform: translateY(-2px);
+        }
+        .tab-button {
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: bold;
+        }
+        /* Style untuk scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-800">Aplikasi Data Pengurus</h1>
+            <div class="flex items-center space-x-4 text-sm font-medium">
+                <span id="userIdDisplay" class="text-gray-500"></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Message Box / Modal -->
+        <div id="messageBox" class="fixed top-20 right-4 p-4 rounded-lg shadow-xl hidden transition-all duration-300 transform -translate-x-full opacity-0 z-50">
+            <p id="messageText" class="font-semibold"></p>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="bg-white p-4 rounded-xl shadow-lg flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mb-8">
+            <button id="dashboardBtn" class="menu-button bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors duration-300">Dashboard</button>
+            <button id="formBtn" class="menu-button bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-600 transition-colors duration-300">Form Input</button>
+            <button id="dataBtn" class="menu-button bg-indigo-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-600 transition-colors duration-300">Data Pengurus</button>
+            <button id="settingsBtn" class="menu-button bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">Pengaturan</button>
+        </nav>
+
+        <!-- Konten Halaman -->
+        <main class="bg-white p-6 rounded-xl shadow-lg">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="content-section">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-indigo-100 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-indigo-700">Total Pengurus</h3>
+                        <p id="totalPengurus" class="text-4xl font-bold text-indigo-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-green-100 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-green-700">Jenis Kelamin (L/P)</h3>
+                        <p id="statistikGender" class="text-2xl font-bold text-green-900 mt-2">0 L / 0 P</p>
+                    </div>
+                    <div class="bg-purple-100 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-purple-700">Jumlah Jabatan Unik</h3>
+                        <p id="statistikJabatan" class="text-4xl font-bold text-purple-900 mt-2">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Input Section -->
+            <div id="formSection" class="content-section hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Formulir Input Data Pengurus</h2>
+                <form id="pengurusForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Biodata -->
+                    <div class="md:col-span-2 space-y-4 p-6 bg-gray-50 rounded-lg shadow-inner">
+                        <h3 class="text-xl font-bold text-gray-700">A. Biodata</h3>
+                        <div>
+                            <label for="niup" class="block text-sm font-medium text-gray-700">NIUP (Nomor Induk Unik Pengurus)</label>
+                            <input type="text" id="niup" name="niup" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        </div>
+                        <div>
+                            <label for="namaLengkap" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                            <input type="text" id="namaLengkap" name="namaLengkap" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        </div>
+                        <div>
+                            <label for="jenisKelamin" class="block text-sm font-medium text-gray-700">Jenis Kelamin</label>
+                            <select id="jenisKelamin" name="jenisKelamin" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                                <option value="">Pilih...</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="tempatTanggalLahir" class="block text-sm font-medium text-gray-700">Tempat, Tanggal Lahir</label>
+                            <input type="text" id="tempatTanggalLahir" name="tempatTanggalLahir" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        </div>
+                    </div>
+
+                    <!-- Alamat -->
+                    <div class="md:col-span-2 space-y-4 p-6 bg-gray-50 rounded-lg shadow-inner">
+                        <h3 class="text-xl font-bold text-gray-700">B. Alamat</h3>
+                        <div>
+                            <label for="kecamatan" class="block text-sm font-medium text-gray-700">Kecamatan</label>
+                            <select id="kecamatan" name="kecamatan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                        <div>
+                            <label for="kabupaten" class="block text-sm font-medium text-gray-700">Kabupaten</label>
+                            <select id="kabupaten" name="kabupaten" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                        <div>
+                            <label for="provinsi" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                            <select id="provinsi" name="provinsi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                    </div>
+
+                    <!-- Domisili -->
+                    <div class="md:col-span-2 space-y-4 p-6 bg-gray-50 rounded-lg shadow-inner">
+                        <h3 class="text-xl font-bold text-gray-700">C. Domisili</h3>
+                        <div>
+                            <label for="wilayah" class="block text-sm font-medium text-gray-700">Wilayah</label>
+                            <select id="wilayah" name="wilayah" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                        <div>
+                            <label for="daerah" class="block text-sm font-medium text-gray-700">Daerah</label>
+                            <select id="daerah" name="daerah" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                        <div>
+                            <label for="kamar" class="block text-sm font-medium text-gray-700">Kamar</label>
+                            <select id="kamar" name="kamar" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                    </div>
+
+                    <!-- Pengurus -->
+                    <div class="md:col-span-2 space-y-4 p-6 bg-gray-50 rounded-lg shadow-inner">
+                        <h3 class="text-xl font-bold text-gray-700">D. Pengurus</h3>
+                        <div>
+                            <label for="jenisPengurus" class="block text-sm font-medium text-gray-700">Jenis Pengurus</label>
+                            <select id="jenisPengurus" name="jenisPengurus" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2"></select>
+                        </div>
+                        <div>
+                            <label for="jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label>
+                            <input type="text" id="jabatan" name="jabatan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        </div>
+                        <div>
+                            <label for="jenisJabatan" class="block text-sm font-medium text-gray-700">Jenis Jabatan</label>
+                            <select id="jenisJabatan" name="jenisJabatan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                                <option value="">Pilih...</option>
+                                <option value="Struktural">Struktural</option>
+                                <option value="Fungsional">Fungsional</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="waktuPenetapan" class="block text-sm font-medium text-gray-700">Waktu Penetapan (Tanggal)</label>
+                            <input type="date" id="waktuPenetapan" name="waktuPenetapan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        </div>
+                        <div>
+                            <label for="berkas" class="block text-sm font-medium text-gray-700">Upload Berkas Kepengurusan (PDF/JPG/PNG)</label>
+                            <input type="file" id="berkas" name="berkas" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2 flex justify-end mt-4">
+                        <button type="submit" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">Simpan Data</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Data Pengurus Section -->
+            <div id="dataSection" class="content-section hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Data Pengurus</h2>
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                    <input type="text" id="searchBar" placeholder="Cari NIUP, Nama, atau Jabatan..." class="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select id="filterJabatan" class="w-full md:w-1/4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Filter Jabatan</option>
+                    </select>
+                    <select id="filterWilayah" class="w-full md:w-1/4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Filter Wilayah</option>
+                    </select>
+                    <button id="exportBtn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300 whitespace-nowrap">Ekspor ke Excel</button>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-lg shadow-xl">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIUP</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Pengurus</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berkas</th>
+                                <th class="relative px-6 py-3">
+                                    <span class="sr-only">Aksi</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataPengurusTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data akan diisi oleh JavaScript -->
+                            <tr><td colspan="7" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settingsSection" class="content-section hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Pengaturan</h2>
+                <!-- Tab Navigation -->
+                <div class="border-b border-gray-200 mb-6 flex space-x-4 overflow-x-auto">
+                    <button id="userTabBtn" class="tab-button py-2 px-4 text-gray-600 hover:text-indigo-600 active">Pengguna</button>
+                    <button id="wilayahTabBtn" class="tab-button py-2 px-4 text-gray-600 hover:text-indigo-600">Data Wilayah</button>
+                    <button id="alamatTabBtn" class="tab-button py-2 px-4 text-gray-600 hover:text-indigo-600">Data Alamat</button>
+                    <button id="jenisPengurusTabBtn" class="tab-button py-2 px-4 text-gray-600 hover:text-indigo-600">Jenis Pengurus</button>
+                </div>
+                
+                <!-- Tab Content -->
+                <div id="userTab" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Pengaturan Akun</h3>
+                    <form id="userSettingsForm" class="bg-gray-50 p-6 rounded-lg shadow-inner space-y-4">
+                        <div>
+                            <label for="userName" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                            <input type="text" id="userName" name="userName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="userUsername" class="block text-sm font-medium text-gray-700">Nama Pengguna (Username)</label>
+                            <input type="text" id="userUsername" name="userUsername" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-200">
+                                <!-- Placeholder for user photo -->
+                                <svg class="h-full w-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 20.993c-.346 0-1.666-.35-2.033-.913a2.33 2.33 0 01-.19-.481c-.246-.576-.443-1.144-.443-1.782V16a4 4 0 014-4h.25v2.75a.75.75 0 001.5 0v-3.5a.75.75 0 00-.75-.75h-10.5a.75.75 0 00-.75.75v3.5a.75.75 0 001.5 0v-2.75H13a4 4 0 014 4v2.09c0 .638-.197 1.206-.443 1.782a2.33 2.33 0 01-.19.481c-.367.563-1.687.913-2.033.913zM6 16c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-2zm2-4h8c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2zM8 4a2 2 0 110-4 2 2 0 010 4z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <label for="userPhoto" class="block text-sm font-medium text-gray-700">Foto Pengguna</label>
+                                <input type="file" id="userPhoto" name="userPhoto" class="mt-1 text-sm text-gray-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="userPassword" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
+                            <input type="password" id="userPassword" name="userPassword" placeholder="Abaikan jika tidak ingin mengubah" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="wilayahTab" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Data Wilayah, Daerah, dan Kamar</h3>
+                    <form id="wilayahForm" class="bg-gray-50 p-6 rounded-lg shadow-inner space-y-4 mb-6">
+                        <div>
+                            <label for="inputWilayah" class="block text-sm font-medium text-gray-700">Wilayah</label>
+                            <input type="text" id="inputWilayah" name="wilayah" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="inputDaerah" class="block text-sm font-medium text-gray-700">Daerah</label>
+                            <input type="text" id="inputDaerah" name="daerah" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="inputKamar" class="block text-sm font-medium text-gray-700">Kamar</label>
+                            <input type="text" id="inputKamar" name="kamar" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">Tambah Data</button>
+                        </div>
+                    </form>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow-xl">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daerah</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kamar</th>
+                                    <th class="relative px-6 py-3">
+                                        <span class="sr-only">Aksi</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="wilayahTableBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="4" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="alamatTab" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Data Kecamatan, Kabupaten, dan Provinsi</h3>
+                    <form id="alamatForm" class="bg-gray-50 p-6 rounded-lg shadow-inner space-y-4 mb-6">
+                        <div>
+                            <label for="inputKecamatan" class="block text-sm font-medium text-gray-700">Kecamatan</label>
+                            <input type="text" id="inputKecamatan" name="kecamatan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="inputKabupaten" class="block text-sm font-medium text-gray-700">Kabupaten</label>
+                            <input type="text" id="inputKabupaten" name="kabupaten" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div>
+                            <label for="inputProvinsi" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                            <input type="text" id="inputProvinsi" name="provinsi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">Tambah Data</button>
+                        </div>
+                    </form>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow-xl">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kecamatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kabupaten</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provinsi</th>
+                                    <th class="relative px-6 py-3">
+                                        <span class="sr-only">Aksi</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="alamatTableBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="4" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="jenisPengurusTab" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Data Jenis Pengurus</h3>
+                    <form id="jenisPengurusForm" class="bg-gray-50 p-6 rounded-lg shadow-inner space-y-4 mb-6">
+                        <div>
+                            <label for="inputJenisPengurus" class="block text-sm font-medium text-gray-700">Nama Jenis Pengurus</label>
+                            <input type="text" id="inputJenisPengurus" name="jenisPengurus" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">Tambah Data</button>
+                        </div>
+                    </form>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow-xl">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Pengurus</th>
+                                    <th class="relative px-6 py-3">
+                                        <span class="sr-only">Aksi</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="jenisPengurusTableBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="2" class="p-4 text-center text-gray-500">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        <p>&copy; 2024 Aplikasi Data Pengurus. Semua Hak Cipta Dilindungi.</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variabel global untuk inisialisasi Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Inisialisasi Firebase
+        let app, db, auth, userId;
+        let isAuthReady = false;
+
+        setLogLevel('debug');
+        
+        // Elemen DOM
+        const dashboardBtn = document.getElementById('dashboardBtn');
+        const formBtn = document.getElementById('formBtn');
+        const dataBtn = document.getElementById('dataBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const formSection = document.getElementById('formSection');
+        const dataSection = document.getElementById('dataSection');
+        const settingsSection = document.getElementById('settingsSection');
+        const pengurusForm = document.getElementById('pengurusForm');
+        const dataPengurusTableBody = document.getElementById('dataPengurusTableBody');
+        const searchBar = document.getElementById('searchBar');
+        const filterJabatan = document.getElementById('filterJabatan');
+        const filterWilayah = document.getElementById('filterWilayah');
+        const exportBtn = document.getElementById('exportBtn');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const totalPengurus = document.getElementById('totalPengurus');
+        const statistikGender = document.getElementById('statistikGender');
+        const statistikJabatan = document.getElementById('statistikJabatan');
+
+        const userTabBtn = document.getElementById('userTabBtn');
+        const wilayahTabBtn = document.getElementById('wilayahTabBtn');
+        const alamatTabBtn = document.getElementById('alamatTabBtn');
+        const jenisPengurusTabBtn = document.getElementById('jenisPengurusTabBtn');
+        const userTab = document.getElementById('userTab');
+        const wilayahTab = document.getElementById('wilayahTab');
+        const alamatTab = document.getElementById('alamatTab');
+        const jenisPengurusTab = document.getElementById('jenisPengurusTab');
+        const userSettingsForm = document.getElementById('userSettingsForm');
+        const userNameInput = document.getElementById('userName');
+        const userUsernameInput = document.getElementById('userUsername');
+        const wilayahForm = document.getElementById('wilayahForm');
+        const alamatForm = document.getElementById('alamatForm');
+        const jenisPengurusForm = document.getElementById('jenisPengurusForm');
+        const wilayahTableBody = document.getElementById('wilayahTableBody');
+        const alamatTableBody = document.getElementById('alamatTableBody');
+        const jenisPengurusTableBody = document.getElementById('jenisPengurusTableBody');
+
+
+        const dropdowns = {
+            jenisPengurus: document.getElementById('jenisPengurus'),
+            kecamatan: document.getElementById('kecamatan'),
+            kabupaten: document.getElementById('kabupaten'),
+            provinsi: document.getElementById('provinsi'),
+            wilayah: document.getElementById('wilayah'),
+            daerah: document.getElementById('daerah'),
+            kamar: document.getElementById('kamar')
+        };
+
+        let allData = [];
+        let dataWilayah = [];
+        let dataAlamat = [];
+        let dataJenisPengurus = [];
+
+
+        // Fungsi untuk menampilkan pesan
+        function showMessage(message, type = 'success') {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'opacity-0', '-translate-x-full');
+            messageBox.classList.add('opacity-100', 'translate-x-0');
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                messageBox.classList.add('bg-red-100', 'text-red-800');
+            }
+            setTimeout(() => {
+                messageBox.classList.remove('opacity-100', 'translate-x-0');
+                messageBox.classList.add('opacity-0', '-translate-x-full');
+            }, 3000);
+        }
+
+        // Fungsi untuk menampilkan bagian konten
+        function showSection(sectionId) {
+            const sections = [dashboardSection, formSection, dataSection, settingsSection];
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Fungsi untuk menampilkan tab pengaturan
+        function showSettingsTab(tabId) {
+            const tabs = [userTab, wilayahTab, alamatTab, jenisPengurusTab];
+            const tabButtons = [userTabBtn, wilayahTabBtn, alamatTabBtn, jenisPengurusTabBtn];
+            tabs.forEach(tab => tab.classList.add('hidden'));
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`${tabId.replace('Tab', 'TabBtn')}`).classList.add('active');
+        }
+
+        // Penanganan Otentikasi
+        window.onload = async () => {
+            try {
+                if (Object.keys(firebaseConfig).length > 0) {
+                    app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            userIdDisplay.textContent = `ID Pengguna: ${userId.substring(0, 8)}...`;
+                            isAuthReady = true;
+                            // Memuat data setelah otentikasi siap
+                            loadData();
+                            loadWilayahData();
+                            loadAlamatData();
+                            loadUserData();
+                            loadJenisPengurusData();
+                        } else {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        }
+                    });
+                } else {
+                    console.error("Firebase config is not set. The app will not function correctly.");
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+            }
+        };
+
+        // Simpan Data Pengurus ke Firestore
+        pengurusForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(pengurusForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                // Validasi NIUP unik
+                const niupQuery = query(collection(db, `artifacts/${appId}/public/data/data_pengurus`), where("niup", "==", data.niup));
+                const niupSnapshot = await getDocs(niupQuery);
+
+                if (!niupSnapshot.empty) {
+                    showMessage('NIUP sudah terdaftar. Mohon gunakan NIUP yang unik.', 'error');
+                    return;
+                }
+
+                // Untuk file upload, simpan nama file dan URL placeholder
+                const fileInput = document.getElementById('berkas');
+                const file = fileInput.files[0];
+                if (file) {
+                    data.berkas = {
+                        name: file.name,
+                        url: `simulated-url/${file.name}` // Placeholder URL
+                    };
+                }
+
+                await addDoc(collection(db, `artifacts/${appId}/public/data/data_pengurus`), data);
+                showMessage('Data pengurus berhasil disimpan!');
+                pengurusForm.reset();
+                showSection('dataSection');
+            } catch (error) {
+                console.error("Error adding document:", error);
+                showMessage('Gagal menyimpan data. Silakan coba lagi.', 'error');
+            }
+        });
+
+        // Simpan Data Wilayah ke Firestore
+        wilayahForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(wilayahForm);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                await addDoc(collection(db, `artifacts/${appId}/public/data/data_wilayah`), data);
+                showMessage('Data wilayah berhasil ditambahkan!');
+                wilayahForm.reset();
+            } catch (error) {
+                console.error("Error adding wilayah document:", error);
+                showMessage('Gagal menambahkan data wilayah.', 'error');
+            }
+        });
+
+        // Simpan Data Alamat ke Firestore
+        alamatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(alamatForm);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                await addDoc(collection(db, `artifacts/${appId}/public/data/data_alamat`), data);
+                showMessage('Data alamat berhasil ditambahkan!');
+                alamatForm.reset();
+            } catch (error) {
+                console.error("Error adding alamat document:", error);
+                showMessage('Gagal menambahkan data alamat.', 'error');
+            }
+        });
+
+        // Simpan Data Jenis Pengurus ke Firestore
+        jenisPengurusForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(jenisPengurusForm);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                await addDoc(collection(db, `artifacts/${appId}/public/data/data_jenis_pengurus`), data);
+                showMessage('Data jenis pengurus berhasil ditambahkan!');
+                jenisPengurusForm.reset();
+            } catch (error) {
+                console.error("Error adding jenis pengurus document:", error);
+                showMessage('Gagal menambahkan data jenis pengurus.', 'error');
+            }
+        });
+
+        // Update User Settings
+        userSettingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = userNameInput.value;
+            const username = userUsernameInput.value;
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/private/user_data`);
+                await setDoc(userDocRef, { name, username }, { merge: true });
+                showMessage('Pengaturan pengguna berhasil diperbarui!');
+            } catch (error) {
+                console.error("Error updating user settings:", error);
+                showMessage('Gagal memperbarui pengaturan pengguna.', 'error');
+            }
+        });
+
+        // Ambil data dan tampilkan secara real-time
+        function loadData() {
+            if (!isAuthReady || !db) return;
+            const q = query(collection(db, `artifacts/${appId}/public/data/data_pengurus`));
+            onSnapshot(q, (snapshot) => {
+                allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTable(allData);
+                updateDashboard(allData);
+            }, (error) => {
+                console.error("Error listening to data:", error);
+                showMessage('Gagal memuat data pengurus.', 'error');
+            });
+        }
+
+        function loadWilayahData() {
+            if (!isAuthReady || !db) return;
+            const q = query(collection(db, `artifacts/${appId}/public/data/data_wilayah`));
+            onSnapshot(q, (snapshot) => {
+                dataWilayah = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderWilayahTable(dataWilayah);
+                populateDropdowns(dataWilayah, ['wilayah', 'daerah', 'kamar']);
+            }, (error) => {
+                console.error("Error listening to wilayah data:", error);
+                showMessage('Gagal memuat data wilayah.', 'error');
+            });
+        }
+
+        function loadAlamatData() {
+            if (!isAuthReady || !db) return;
+            const q = query(collection(db, `artifacts/${appId}/public/data/data_alamat`));
+            onSnapshot(q, (snapshot) => {
+                dataAlamat = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAlamatTable(dataAlamat);
+                populateDropdowns(dataAlamat, ['kecamatan', 'kabupaten', 'provinsi']);
+            }, (error) => {
+                console.error("Error listening to alamat data:", error);
+                showMessage('Gagal memuat data alamat.', 'error');
+            });
+        }
+
+        function loadJenisPengurusData() {
+            if (!isAuthReady || !db) return;
+            const q = query(collection(db, `artifacts/${appId}/public/data/data_jenis_pengurus`));
+            onSnapshot(q, (snapshot) => {
+                dataJenisPengurus = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderJenisPengurusTable(dataJenisPengurus);
+                populateDropdowns(dataJenisPengurus, ['jenisPengurus']);
+            }, (error) => {
+                console.error("Error listening to jenis pengurus data:", error);
+                showMessage('Gagal memuat data jenis pengurus.', 'error');
+            });
+        }
+        
+        function loadUserData() {
+            if (!isAuthReady || !db) return;
+            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/private/user_data`);
+            onSnapshot(userDocRef, (doc) => {
+                if (doc.exists()) {
+                    const userData = doc.data();
+                    userNameInput.value = userData.name || '';
+                    userUsernameInput.value = userData.username || '';
+                }
+            }, (error) => {
+                console.error("Error listening to user data:", error);
+            });
+        }
+
+        function populateDropdowns(data, fields) {
+            fields.forEach(field => {
+                const selectElement = dropdowns[field];
+                const currentSelected = selectElement.value;
+                selectElement.innerHTML = '<option value="">Pilih...</option>';
+                const uniqueItems = [...new Set(data.map(item => item[field]))].sort();
+                uniqueItems.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    selectElement.appendChild(opt);
+                });
+                if (uniqueItems.includes(currentSelected)) {
+                    selectElement.value = currentSelected;
+                }
+            });
+        }
+
+        function renderTable(data) {
+            dataPengurusTableBody.innerHTML = '';
+            const existingJabatan = new Set();
+            const existingWilayah = new Set();
+
+            if (data.length === 0) {
+                dataPengurusTableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500">Tidak ada data pengurus yang ditemukan.</td></tr>';
+            } else {
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50', 'transition-colors');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.niup}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.namaLengkap}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.jenisPengurus || ''}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.jabatan}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.wilayah}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 underline">
+                            <a href="${item.berkas?.url || '#'}" target="_blank">${item.berkas?.name || 'Tidak ada'}</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 ml-4 delete-btn" data-id="${item.id}" data-collection="data_pengurus">Hapus</button>
+                        </td>
+                    `;
+                    dataPengurusTableBody.appendChild(row);
+
+                    // Kumpulkan opsi filter
+                    existingJabatan.add(item.jabatan);
+                    existingWilayah.add(item.wilayah);
+                });
+            }
+
+            // Perbarui filter dropdown
+            updateFilterOptions(filterJabatan, Array.from(existingJabatan));
+            updateFilterOptions(filterWilayah, Array.from(existingWilayah));
+        }
+
+        function renderWilayahTable(data) {
+            wilayahTableBody.innerHTML = '';
+            if (data.length === 0) {
+                wilayahTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Tidak ada data wilayah yang ditemukan.</td></tr>';
+            } else {
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50', 'transition-colors');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.wilayah}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.daerah}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.kamar}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 ml-4 delete-btn" data-id="${item.id}" data-collection="data_wilayah">Hapus</button>
+                        </td>
+                    `;
+                    wilayahTableBody.appendChild(row);
+                });
+            }
+        }
+
+        function renderAlamatTable(data) {
+            alamatTableBody.innerHTML = '';
+            if (data.length === 0) {
+                alamatTableBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Tidak ada data alamat yang ditemukan.</td></tr>';
+            } else {
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50', 'transition-colors');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.kecamatan}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.kabupaten}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.provinsi}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 ml-4 delete-btn" data-id="${item.id}" data-collection="data_alamat">Hapus</button>
+                        </td>
+                    `;
+                    alamatTableBody.appendChild(row);
+                });
+            }
+        }
+
+        function renderJenisPengurusTable(data) {
+            jenisPengurusTableBody.innerHTML = '';
+            if (data.length === 0) {
+                jenisPengurusTableBody.innerHTML = '<tr><td colspan="2" class="p-4 text-center text-gray-500">Tidak ada data jenis pengurus yang ditemukan.</td></tr>';
+            } else {
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50', 'transition-colors');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.jenisPengurus}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 ml-4 delete-btn" data-id="${item.id}" data-collection="data_jenis_pengurus">Hapus</button>
+                        </td>
+                    `;
+                    jenisPengurusTableBody.appendChild(row);
+                });
+            }
+        }
+
+        function updateFilterOptions(selectElement, options) {
+            const currentSelected = selectElement.value;
+            selectElement.innerHTML = `<option value="">${selectElement.firstElementChild.textContent}</option>`;
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                selectElement.appendChild(opt);
+            });
+            // Pertahankan pilihan yang sudah ada jika masih valid
+            if (options.includes(currentSelected)) {
+                selectElement.value = currentSelected;
+            }
+        }
+
+        // Fungsi untuk memperbarui dashboard
+        function updateDashboard(data) {
+            totalPengurus.textContent = data.length;
+
+            const genderCount = data.reduce((acc, curr) => {
+                if (curr.jenisKelamin === 'Laki-laki') acc.L++;
+                if (curr.jenisKelamin === 'Perempuan') acc.P++;
+                return acc;
+            }, { L: 0, P: 0 });
+            statistikGender.textContent = `${genderCount.L} L / ${genderCount.P} P`;
+
+            const jabatanUnik = new Set(data.map(d => d.jabatan));
+            statistikJabatan.textContent = jabatanUnik.size;
+        }
+
+        // Pencarian dan Filter
+        function applyFilters() {
+            const searchTerm = searchBar.value.toLowerCase();
+            const selectedJabatan = filterJabatan.value;
+            const selectedWilayah = filterWilayah.value;
+
+            const filteredData = allData.filter(item => {
+                const matchesSearch = searchTerm === '' ||
+                    item.niup.toLowerCase().includes(searchTerm) ||
+                    item.namaLengkap.toLowerCase().includes(searchTerm) ||
+                    item.jabatan.toLowerCase().includes(searchTerm);
+                const matchesJabatan = selectedJabatan === '' || item.jabatan === selectedJabatan;
+                const matchesWilayah = selectedWilayah === '' || item.wilayah === selectedWilayah;
+
+                return matchesSearch && matchesJabatan && matchesWilayah;
+            });
+            renderTable(filteredData);
+        }
+
+        searchBar.addEventListener('input', applyFilters);
+        filterJabatan.addEventListener('change', applyFilters);
+        filterWilayah.addEventListener('change', applyFilters);
+
+        // Hapus Data dari Firestore
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const docId = e.target.getAttribute('data-id');
+                const collectionName = e.target.getAttribute('data-collection');
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/${collectionName}`, docId));
+                    showMessage(`Data ${collectionName} berhasil dihapus!`);
+                } catch (error) {
+                    console.error("Error removing document:", error);
+                    showMessage('Gagal menghapus data.', 'error');
+                }
+            }
+        });
+
+        // Ekspor ke Excel (CSV)
+        exportBtn.addEventListener('click', () => {
+            const header = ["NIUP", "Nama Lengkap", "Jenis Kelamin", "Tempat Tanggal Lahir", "Kecamatan", "Kabupaten", "Provinsi", "Wilayah", "Daerah", "Kamar", "Jenis Pengurus", "Jabatan", "Jenis Jabatan", "Waktu Penetapan", "Berkas"];
+            const rows = allData.map(item => [
+                item.niup,
+                item.namaLengkap,
+                item.jenisKelamin,
+                item.tempatTanggalLahir,
+                item.kecamatan,
+                item.kabupaten,
+                item.provinsi,
+                item.wilayah,
+                item.daerah,
+                item.kamar,
+                item.jenisPengurus,
+                item.jabatan,
+                item.jenisJabatan,
+                item.waktuPenetapan,
+                item.berkas?.name || ''
+            ]);
+            
+            let csvContent = "data:text/csv;charset=utf-8," + header.join(";") + "\n" + rows.map(e => e.join(";")).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data_pengurus.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Event listener untuk navigasi
+        dashboardBtn.addEventListener('click', () => showSection('dashboardSection'));
+        formBtn.addEventListener('click', () => showSection('formSection'));
+        dataBtn.addEventListener('click', () => showSection('dataSection'));
+        settingsBtn.addEventListener('click', () => showSection('settingsSection'));
+
+        // Event listener untuk tab navigasi di Pengaturan
+        userTabBtn.addEventListener('click', () => showSettingsTab('userTab'));
+        wilayahTabBtn.addEventListener('click', () => showSettingsTab('wilayahTab'));
+        alamatTabBtn.addEventListener('click', () => showSettingsTab('alamatTab'));
+        jenisPengurusTabBtn.addEventListener('click', () => showSettingsTab('jenisPengurusTab'));
+
+        // Tampilkan Dashboard secara default saat pertama kali dimuat
+        showSection('dashboardSection');
+        showSettingsTab('userTab');
+    </script>
+</body>
+</html>
